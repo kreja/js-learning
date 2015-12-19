@@ -1,0 +1,236 @@
+// Mixins
+// 一个less基础函数库，不对外输出，只作为编译依赖
+
+.clearfix() {
+    *zoom: 1;
+    &:before,
+    &:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+// 未知尺寸图片居中
+.image-center(@width, @height){
+
+    @_fontsize: round(@height * 0.873);
+
+    width: ~'@{width}px';
+    height: ~'@{height}px';
+    overflow: hidden;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+
+    *display: block;//IE hack
+    *font-size: ~"@{_fontsize}px";
+
+    img{
+        max-height: ~'@{height}px';
+        max-width: ~'@{width}px';
+        vertical-align: middle;
+    }
+}
+
+.background-cover(@image-path) {
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url(@image-path);
+        //filters are not relative to css, they require a full server path
+        filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='@{image-path}', sizingMethod='scale');
+        -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='@{image-path}', sizingMethod='scale')";
+}
+
+// 单行文字截断
+.text-overflow(){
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+}
+
+// 多行文字截断
+.text-overflow-lines(@line: 2){
+        display: -webkit-box;
+        -webkit-line-clamp: @line;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+}
+
+// 水平居中
+.center(){
+        display: -webkit-box;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+}
+
+// 垂直居中
+.vertical-center(){
+        display: -webkit-box;
+        -webkit-box-pack: center;
+}
+
+.flex(){
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+}
+
+.flex-avg(){
+        -webkit-box-flex: 1;
+        -ms-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+        display: block; //-webkit-box-flex时需要
+        width: 1px; //当内容超过均分的内容时需要
+}
+
+//背景色透明 rgba
+.rgba(@colour, @alpha)
+{
+        @alphaColour: hsla(hue(@colour), saturation(@colour), lightness(@colour), @alpha);
+        @ieAlphaColour: argb(@alphaColour);
+
+        background-color: @colour; // Fallback for older browsers
+        background-color: @alphaColour;
+
+        // IE hacks
+        zoom: 1; // hasLayout
+        background-color: transparent\9;
+        -ms-filter:  "progid:DXImageTransform.Microsoft.gradient(startColorstr=@{ieAlphaColour}, endColorstr=@{ieAlphaColour})"; // IE 8+
+                filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{ieAlphaColour}, endColorstr=@{ieAlphaColour})"; // IE 6 & 7
+
+}
+
+//**
+// * 圆角
+// */
+.border-radius(@radius: 5px) {
+        -webkit-border-radius: @radius;
+        border-radius: @radius;
+}
+
+//单角
+.border-top-left-radius(@radius: 5px) {
+    -webkit-border-top-left-radius: @radius;
+            -moz-border-radius-topleft: @radius;
+                    border-top-left-radius: @radius;
+}
+.border-top-right-radius(@radius: 5px) {
+    -webkit-border-top-right-radius: @radius;
+            -moz-border-radius-topright: @radius;
+                    border-top-right-radius: @radius;
+}
+.border-bottom-right-radius(@radius: 5px) {
+    -webkit-border-bottom-right-radius: @radius;
+            -moz-border-radius-bottomright: @radius;
+                    border-bottom-right-radius: @radius;
+}
+.border-bottom-left-radius(@radius: 5px) {
+    -webkit-border-bottom-left-radius: @radius;
+            -moz-border-radius-bottomleft: @radius;
+                    border-bottom-left-radius: @radius;
+}
+
+//单边
+.border-top-radius(@radius: 5px) {
+    .border-top-right-radius(@radius);
+    .border-top-left-radius(@radius);
+}
+.border-right-radius(@radius: 5px) {
+    .border-top-right-radius(@radius);
+    .border-bottom-right-radius(@radius);
+}
+.border-bottom-radius(@radius: 5px) {
+    .border-bottom-right-radius(@radius);
+    .border-bottom-left-radius(@radius);
+}
+.border-left-radius(@radius: 5px) {
+    .border-top-left-radius(@radius);
+    .border-bottom-left-radius(@radius);
+}
+
+//**
+// * border-shadow
+// * @params  none | [inset? && [ <offset-x> <offset-y> <blur-radius>? <spread-radius>? <color>? ] ]#
+// *          none | [内映射? && [横向平移 纵向平移 模糊? 扩散? 颜色?]]#
+// */
+
+.box-shadow(@shadow: 5px 5px 10px #cccccc) {
+    -webkit-box-shadow: @shadow;
+         -moz-box-shadow: @shadow;
+                    box-shadow: @shadow;
+}
+
+//**
+// * box-sizing 盒模型计算方式
+// */
+
+.box-sizing(@boxmodel) {
+        -webkit-box-sizing: @boxmodel;
+         -moz-box-sizing: @boxmodel;
+                        box-sizing: @boxmodel;
+}
+
+//**
+// * 换行自动或手动添加连字符
+// * hyphens是css4的属性，可能存在问题
+// */
+.hyphens(@mode: auto) {
+    word-wrap: break-word;
+    -webkit-hyphens: @mode;
+         -moz-hyphens: @mode;
+            -ms-hyphens: @mode;
+             -o-hyphens: @mode;
+                    hyphens: @mode;
+}
+.word-break(@word-break){
+    -ms-word-break: @word-break;
+        word-break: @word-break;
+}
+.hyphenation(){
+    .word-break(break-all);
+    .hyphens();
+}
+
+//**
+// * 透明度
+// */
+.opacity(@opacity:1) {
+    opacity: @opacity;
+    // IE8 filter
+    @opacity-ie: (@opacity * 100);
+    filter: ~"alpha(opacity=@{opacity-ie})";
+    //IE6 7
+    -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=(@{opacity-ie}))";
+}
+
+//**
+// * text-shadow
+// * @params  [ <color>? <offset-x> <offset-y> <blur-radius>? | <offset-x> <offset-y> <blur-radius>? <color>? ]
+// *         采用第一种参数方式，并不支持多重阴影
+//*/
+
+//早期的ipad需要-webkit
+
+.text-shadow(@shadow){
+    -webkit-text-shadow: @shadow;
+    text-shadow: @shadow;
+}
+
+// Placeholder text
+.placeholder(@color: @input-color-placeholder) {
+    &::-moz-placeholder           { color: @color;   // Firefox
+                                                                    opacity: 1; } // See https://github.com/twbs/bootstrap/pull/11526
+    &:-ms-input-placeholder       { color: @color; } // Internet Explorer 10+
+    &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome
+}
+
+.scale(){
+        -webkit-transform: scale(0.83);
+        -webkit-transform-origin: 0% 0%;
+}
