@@ -1,5 +1,7 @@
+'use strict';
+/**
+ * 工具函数
+ * @type {Object}
+ */
 module.exports = {
-    insert: function(){
-        $('<p>from util</p>').insertAfter('.content');
-    }
 };
