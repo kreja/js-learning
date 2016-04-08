@@ -32,3 +32,5 @@ npm run build
     * 出自[mostly-adequate-guide](https://github.com/MostlyAdequate/mostly-adequate-guide)
     * 翻译[js 函数式编程指南](https://www.gitbook.com/book/llh911001/mostly-adequate-guide-chinese)
     * js-fn-compose 组合
+
+* fp* [《JavaScript 函数式编程》](https://book.douban.com/subject/26579320/)阅读实践

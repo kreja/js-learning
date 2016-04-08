@@ -24,5 +24,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --config webpack-dev.config.js --progress --open",
     "build": "webpack --config webpack-production.config.js --profile --progress"
+  },
+  "dependencies": {
+    "underscore": "~1.8.3"
   }
 }
