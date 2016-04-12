@@ -7,7 +7,7 @@ var _ = require('underscore');
 
 var dom = {
     print: function(){
-        var s = _.toArray(arguments).join(' ');
+        var s = _.map(arguments, JSON.stringify).join(' ');
         var p = document.createElement('p');
         var newContent = document.createTextNode(s);
         p.appendChild(newContent);

@@ -37,10 +37,10 @@ var dynamicLookup = function(k){
 stackBinder('a', 1);
 stackBinder('b', 2);
 dynamicLookup('a');
-printToDom(JSON.stringify(globals));
+printToDom(globals);
 stackUnbinder('a');
 dynamicLookup('a');
-printToDom(JSON.stringify(globals));
+printToDom(globals);
 
 
 
@@ -116,7 +116,7 @@ printToDom('window.i 没有改变，还是', window.i);
 printDivider('闭包');
 function showObj(OBJ){
     return function(){
-        printToDom(JSON.stringify(OBJ));
+        printToDom(OBJ);
         return OBJ;
     };
 }
