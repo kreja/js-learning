@@ -277,6 +277,219 @@ printToDom( generator.uniqueString('私有') );
 
 
 
+/////////
+// 防止不存在的函数：使用 fnull //
+/////////
+printDivider('防止不存在的函数：使用 fnull');
+var nums = [1, 2, 3, null, 5];
+printToDom(
+    '因为有个 null，所以乘积结果是错误的',
+    _.reduce(nums, function(product, n){
+        return product * n;
+    })
+);
+
+/**
+ * 封装 func，提供默认参数
+ * 只能解决一级 null/undefined
+ * 对于 {name: null, age: 18} 这种二级 null 无法解决
+ */
+function fnull(func /*, defaults*/){
+    var defaults = _.rest(arguments); // 默认参数
+
+    return function(/*args*/){ // 返回包装后的守卫函数
+        // 只有在 守卫函数 被调用时才会遍历默认值，即只在需要的时候发生
+        var args = _.map(arguments, function(e, i){
+            return existy(e) ? e : defaults[i]; // 默认参数代替 null/undefined
+        });
+        return func.apply(null, args);
+    };
+}
+var nums = [1, 2, 3, null, 5];
+var saveMult = fnull(function(product, n){
+    return product * n;
+}, 1, 1);
+printToDom(
+    '使用 fnull 得到正确结果',
+    _.reduce( nums, saveMult)
+);
+
+// 解决配置对象的问题 ⭐️⭐️⭐️
+printDivider('解决配置对象的问题 ⭐️⭐️⭐️');
+function defaults(d){ // 默认配置对象
+    return function(o, k){ // object key
+        var val = fnull(_.identity, d[k]); // 守卫函数，会把空参数替换成默认参数
+        return o && val(o[k]);
+    };
+}
+function findName(person){
+    var lookup = defaults({name: 'jack'});
+    return lookup(person, 'name'); // 找到 person 的 name 属性
+}
+printToDom(
+    '正确参数',
+    findName({name: 'rose'})
+);
+printToDom(
+    '默认参数',
+    findName({name: null})
+);
+printToDom(
+    '默认参数',
+    findName({})
+);
+
+
+
+
+printDivider('解决配置对象的问题 - 自我推导');
+// old way 写 findName
+function findName(person){
+    // val 就是一个守卫函数，它自带默认值
+    var val = fnull(_.identity, 'jack'); // fnull(_.identity /*, defaults*/) 很有用！就是把单个 null/ undefined 转换成 默认参数
+    return person && val(person.name); // 如果 person.name 是空，就会用 jack 替代
+}
+// 升级 findName，更通用，而不只是针对 person (这里 person 替换成了 obj)
+function defaults(config){
+    return function(obj, key){ // 其实就是获取 obj 里的 key 值，不过当 obj[key] 是空时会用默认值替换
+        var val = fnull(_.identity, config[key]);
+        return obj && val(obj[key]);
+    };
+}
+var find = defaults({name: 'Jay'});
+printToDom(
+    find({}, 'name')
+);
+// 再优化，直接写成 findName
+var findName = function(person){
+    return find(person, 'name');
+};
+printToDom(
+    findName({})
+);
+
+
+
+
+
+/////////
+// 对象校验器 //
+/////////
+printDivider('对象校验器');
+/**
+ * 参数：若干个验证器（谓词函数）
+ * return: 一个 checker 函数，他会用这些验证器进行验证，如果验证错误就会添加错误信息到数组中，最后返回该数组
+ * 所以返回空数组就表明通过了所有验证器
+ */
+function checker(/*validators*/){ // validator 是 谓词函数
+    var validators = _.toArray(arguments); // 要 toArray，因为 arguments 不是数组
+
+    return function(obj){
+        // 用 reduce 是一个棒棒的选择！因为它可以记录 errs
+        return _.reduce(validators, function(errs, check){ // check 就是当前的验证器
+            if(check(obj)){
+                return errs; // 通过 check, errs 不变
+            }else{
+                // check 是一个验证器，它是一个函数，他还有一个 message 属性，表示错误信息
+                return _.chain(errs).push(check.message).value(); // 不通过，添加 err
+            }
+        }, []);
+    };
+}
+
+// 永远通过的验证器
+var alwaysPasses = checker( always(true), always(true) );
+printToDom(
+    alwaysPasses({})
+);
+
+var fails = always(false);
+fails.message = 'a failure in life'; // 要另外设置 message，不好
+var alwaysFails = checker(fails, always(true), fails);
+printToDom(
+    alwaysFails({})
+);
+
+
+// 验证器优化，不需要另外设置 message
+function validator(message, fun){
+    // 为什么不是直接 f = fun?
+    // 应该是因为这一段：
+    //      message 是一个非常普通的属性名，如果给它设置值可能会抹掉正常的值，所以要新建一个 function
+    var f = function(/* args */){
+        return fun.apply(fun, arguments);
+    };
+
+    f.message = message;
+    return f;
+}
+var gonnaFail = checker( validator('ZOMG!', always(false)) );
+printToDom(
+    gonnaFail(100)
+);
+
+// 起一个更具有描述性的名字
+function aMap(obj){
+    return _.isObject(obj);
+}
+var checkCommand = checker( validator('must be a map', aMap) );
+printToDom(
+    checkCommand(100)
+);
+
+
+printDivider('对象校验器-hasKeys');
+/**
+ * 得到一个谓词函数，判断对象是否有某些 key
+ */
+function hasKeys(){
+    var keys = _.toArray(arguments);
+
+    var fun = function(obj){
+        // 每一个 key 都有才返回 true
+        return _.every(keys, function(k){
+            return _.has(obj, k);
+        });
+    };
+
+    fun.message = ['Must have values for keys:'].concat(keys).join(' ');
+    return fun;
+}
+var checkCommand = checker( validator('must be a map', aMap), hasKeys('name', 'age') );
+printToDom(
+    checkCommand(1)
+);
+printToDom(
+    checkCommand({name: 'ok', age: 12})
+);
+
+
+
+/////////
+// 推荐用 _.chain ，因为可以进行链式调用 //
+/////////
+printDivider('用 _.chain 进行链式调用');
+var peoples = [{
+    name: 'jack'
+},{
+    name: 'rose'
+}];
+printToDom(
+    _.chain(peoples).push({
+        name: 'bob'
+    }).shift().map(function(x){
+        return x.name;
+    })
+);
+
+
+
+
+
+
+
+
+
 
 
 
