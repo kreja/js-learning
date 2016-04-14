@@ -28,6 +28,10 @@ for(var bottle = 9; bottle > 0; bottle--){
 printToDom(lyrics);
 
 
+
+
+
+
 /////////
 // 函数式 //
 /////////
@@ -78,14 +82,15 @@ printToDom( _.filter(a, complement(_.isNumber)) );
 
 
 
+
+
 /////////////////
 // Applicative 示例，参考一下怎么用函数式方式处理咯 //
 /////////////////
-console.log('Applicative 示例');
+printDivider('Applicative 示例');
 function existy(x){
     return x != null;
 }
-
 // 把元素连接起来
 function cat(){
     var head = _.first(arguments);
@@ -97,20 +102,20 @@ function cat(){
         return [];
     }
 }
-console.log( cat([1, 2, 3], [4, 5]) );
+printToDom( cat([1, 2, 3], [4, 5]) );
 
 // 把 head 加到 tail 前
 function construct(head, tail){
     return cat([head], _.toArray(tail)); // 为什么要 _.toArray ？看下面注释
 }
-console.log( construct(4, [1]) );
-console.log( construct(4, {a: 2}) ); // 不用 _.toArray 的话结果就不一样了
+printToDom( construct(4, [1]) );
+printToDom( construct(4, {a: 2}) ); // 不用 _.toArray 的话结果就不一样了
 
 // 对 coll 进行 map(func) 然后再把结果连起来
 function mapcat(func, coll){
     return cat.apply(null, _.map(coll, func));
 }
-console.log(
+printToDom(
     mapcat(function(ele){ // 数组间隔插入元素
         return construct(ele, [',']);
     }, [1, 2, 3])
@@ -126,7 +131,7 @@ function interpose(inter, coll){
         return construct(ele, [inter]);
     }, coll));
 }
-console.log( interpose(',', [1, 2, 3]) );
+printToDom( interpose(',', [1, 2, 3]) );
 
 
 
