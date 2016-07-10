@@ -80,7 +80,7 @@ printToDom(
         return x > y;
     }, [1, 3, 2])
 );
-
+// 受上面 best 函数启发，finder 升级为，bestFunc 是一个谓词
 function finder(valueFunc, bestFunc, coll){
     return _.reduce(coll, function(best, current){
         return bestFunc(valueFunc(best), valueFunc(current)) ? best : current;
@@ -199,7 +199,7 @@ function invoker(name, method){
             return ;
         }
         var targetMethod = target[name]; // 得到方法
-        var args = _.rest(arguments);
+        var args = _.rest(arguments); // 调用对象就要放到参数中，而原来的参数就是 _.rest(arguments)
 
         return doWhen(existy(targetMethod) && method===targetMethod, function(){
             return targetMethod.apply(target, args);
@@ -218,6 +218,7 @@ printToDom(
         return x * 2;
     })
 );
+
 
 
 
@@ -299,6 +300,7 @@ function fnull(func /*, defaults*/){
 
     return function(/*args*/){ // 返回包装后的守卫函数
         // 只有在 守卫函数 被调用时才会遍历默认值，即只在需要的时候发生
+        // 其实：按低级的思想，就是在函数开头先把默认函数处理一遍，而这里把这个处理的过程抽象出来了，所以不用在定义单个函数时再去处理了，只要声明默认参数就可以了
         var args = _.map(arguments, function(e, i){
             return existy(e) ? e : defaults[i]; // 默认参数代替 null/undefined
         });
@@ -313,6 +315,8 @@ printToDom(
     '使用 fnull 得到正确结果',
     _.reduce( nums, saveMult)
 );
+
+
 
 // 解决配置对象的问题 ⭐️⭐️⭐️
 printDivider('解决配置对象的问题 ⭐️⭐️⭐️');
@@ -378,6 +382,7 @@ printToDom(
 printDivider('对象校验器');
 /**
  * 参数：若干个验证器（谓词函数）
+ *     validators 是谓词函数，且带有一个 message 属性，表示错误信息
  * return: 一个 checker 函数，他会用这些验证器进行验证，如果验证错误就会添加错误信息到数组中，最后返回该数组
  * 所以返回空数组就表明通过了所有验证器
  */
@@ -462,6 +467,9 @@ printToDom(
 printToDom(
     checkCommand({name: 'ok', age: 12})
 );
+
+
+
 
 
 

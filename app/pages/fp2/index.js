@@ -108,7 +108,7 @@ printToDom( cat([1, 2, 3], [4, 5]) );
 function construct(head, tail){
     return cat([head], _.toArray(tail)); // 为什么要 _.toArray ？看下面注释
 }
-printToDom( construct(4, [1]) );
+printToDom( '【111】', construct(4, [1]) );
 printToDom( construct(4, {a: 2}) ); // 不用 _.toArray 的话结果就不一样了
 
 // 对 coll 进行 map(func) 然后再把结果连起来
