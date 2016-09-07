@@ -18,7 +18,7 @@
     "style-loader": "~0.12.4",
     "url-loader": "~0.5.6",
     "webpack": "~1.12.2",
-    "webpack-dev-server": "CodeYellowBV/webpack-dev-server#98fd2f45b4a81"
+    "webpack-dev-server": "^1.15.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -26,6 +26,7 @@
     "build": "webpack --config webpack-production.config.js --profile --progress"
   },
   "dependencies": {
+    "ramda": "^0.22.1",
     "underscore": "~1.8.3"
   }
 }
